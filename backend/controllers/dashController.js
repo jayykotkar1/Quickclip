@@ -1,9 +1,15 @@
 // Import required modules
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import PdfReader from "pdfreader"; // Import pdfreader package
+import multer from "multer";
+import fs from 'fs';
+import path from 'path';
 
 // Initialize GoogleGenerativeAI instance with your API key
-const genAI = new GoogleGenerativeAI("AIzaSyDuC7b3V4V-BhFC9083BRP53GNhAllGlYQ");
+// const genAI = new GoogleGenerativeAI("AIzaSyDuC7b3V4V-BhFC9083BRP53GNhAllGlYQ");
+// const genAI = new GoogleGenerativeAI("AIzaSyCciJzDBszuJg0-RYMDNo2u2efJwABfkBs");
+const genAI = new GoogleGenerativeAI("AIzaSyCetBxNpYl-jORv9BeukN1bwDRXbUSSPJI");
 
 // Function to fetch video details from YouTube Data API
 const fetchVideoData = async (videoId) => {
@@ -262,9 +268,216 @@ const analyzeCommentsWithGemini = async (comments) => {
     return sentimentResults;
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////
+// Multer setup to handle PDF uploads
+const storage = multer.diskStorage({
+    destination: './uploads/',
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage }).single('pdf');
 
+// Function to extract text from a PDF using pdfreader
+const extractTextFromPdf = async (filePath) => {
+    return new Promise((resolve, reject) => {
+        let pdfText = '';
+
+        const reader = new PdfReader.PdfReader();
+
+        // Read the PDF file content
+        reader.parseFileItems(filePath, (err, item) => {
+            if (err) {
+                reject("Error reading PDF file: " + err);
+            } else if (!item) {
+                // End of file, resolve the accumulated text
+                resolve(pdfText);
+            } else if (item.text) {
+                // Add the text to the pdfText variable
+                pdfText += item.text + ' ';
+            }
+        });
+    });
+};
+
+
+const summarizePdf = async (req, res) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            return res.status(500).json({ success: false, error: 'Error uploading the PDF.' });
+        }
+
+        const pdfPath = req.file.path;
+
+        try {
+            // Step 1: Extract text from the uploaded PDF
+            const pdfText = await extractTextFromPdf(pdfPath);
+
+            // Step 2: Generate summary using the Gemini model
+            const prompt = `From now you are a PDF summarizer. Please summarize the following content: ${pdfText}`;
+
+            // Get the model
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+            // Generate content using the model
+            const result = await model.generateContent(prompt);
+
+            // Safely extract the response text
+            // Here we adjust the extraction method based on your needs
+            if (result.response && result.response.candidates && result.response.candidates.length > 0) {
+                const summary = await result.response.text(); // Adjust this if necessary to access the summary
+
+                // Step 3: Return the summary
+                res.status(200).json({
+                    success: true,
+                    summary: summary.trim()
+                });
+            } else {
+                console.error('Unexpected response structure:', result);
+                res.status(500).json({ success: false, error: 'Failed to generate summary' });
+            }
+        } catch (error) {
+            console.error('Error generating summary:', error);
+            res.status(500).json({ success: false, error: 'Failed to generate summary' });
+        } finally {
+            // Clean up the uploaded PDF file
+            fs.unlinkSync(pdfPath);
+        }
+    });
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+const summarizePdfCHAT = async (req, res) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            return res.status(500).json({ success: false, error: 'Error uploading the PDF.' });
+        }
+
+        const pdfPath = req.file.path;
+
+        try {
+            // Step 1: Extract text from the uploaded PDF
+            const pdfText = await extractTextFromPdf(pdfPath);
+
+            // Step 2: Generate summary using the Gemini model
+            const prompt = `From now you are a PDF summarizer. Please summarize the following content: ${pdfText}`;
+
+            // Get the model
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+            // Generate content using the model
+            const result = await model.generateContent(prompt);
+
+            // Safely extract the response text
+            if (result.response && result.response.candidates && result.response.candidates.length > 0) {
+                const summary = result.response.text(); // Access the summary correctly
+
+
+                // Step 3: Return the summary
+                res.status(200).json({
+                    success: true,
+                    summary: summary.trim()
+                });
+            } else {
+                console.error('Unexpected response structure:', result);
+                res.status(500).json({ success: false, error: 'Failed to generate summary' });
+            }
+        } catch (error) {
+            console.error('Error generating summary:', error);
+            if (error.response) {
+                console.error('API Response:', error.response.data);
+                return res.status(error.response.status).json({ success: false, error: error.response.data.error });
+            }
+            res.status(500).json({ success: false, error: 'Failed to generate summary' });
+        } finally {
+            // Clean up the uploaded PDF file
+            fs.unlinkSync(pdfPath);
+        }
+    });
+};
+
+
+const handlePDFChatbotQuery = async (req, res) => {
+    const { userQuery, pdfSummary } = req.body; // Extract user query and PDF summary from the request body
+
+    // Check if all required data is provided
+    if (!userQuery || !pdfSummary) {
+        return res.status(400).json({ success: false, error: 'User query and PDF summary are required.' });
+    }
+
+    try {
+        // Construct the prompt for the chatbot
+        const prompt = `You are a chatbot trained on the following PDF summary. Respond to the user's query: ${userQuery} Summary: ${pdfSummary}`;
+
+        // Get the model
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+        // Generate response using the model
+        const result = await model.generateContent(prompt);
+
+        // Safely extract the response text
+        const response = await result.response.text(); // Adjusted to extract response properly
+
+        // Step 3: Return the chatbot response
+        res.status(200).json({
+            success: true,
+            response: response.trim()
+        });
+    } catch (error) {
+        console.error('Error generating chatbot response:', error);
+        res.status(500).json({ success: false, error: 'Failed to generate chatbot response' });
+    }
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const summarizeWebDocument = async (req, res) => {
+    const { url } = req.body;
+
+    if (!url) {
+        return res.status(400).json({ success: false, error: 'URL is required.' });
+    }
+
+    let attempts = 0;
+    const maxAttempts = 3; // Number of retry attempts
+
+    while (attempts < maxAttempts) {
+        try {
+            // Create the prompt
+            const prompt = `You are a documentation summarizer. Please summarize the content from the following link: ${url}`;
+
+            // Get the model
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+            // Generate content using the model
+            const result = await model.generateContent(prompt);
+
+            // Extract the summary
+            if (result.response && result.response.candidates && result.response.candidates.length > 0) {
+                const summary = result.response.text();
+
+                // Send the summary
+                return res.status(200).json({ success: true, summary: summary.trim() });
+            } else {
+                console.error('Unexpected response structure:', result);
+                return res.status(500).json({ success: false, error: 'Failed to generate summary' });
+            }
+        } catch (error) {
+            console.error(`Error generating summary on attempt ${attempts + 1}:`, error);
+
+            if (error.status === 500 && attempts < maxAttempts - 1) {
+                // Retry on internal server error
+                attempts++;
+                continue;
+            }
+
+            return res.status(500).json({ success: false, error: 'Failed to generate summary' });
+        }
+    }
+};
 
 
 
 // Explicitly export the function
-export { dashSummarize, summarizeVideo, handleChatbotQuery, fetchAndAnalyzeComments };
+export { dashSummarize, summarizeVideo, handleChatbotQuery, fetchAndAnalyzeComments, summarizePdf, summarizePdfCHAT, handlePDFChatbotQuery, summarizeWebDocument };

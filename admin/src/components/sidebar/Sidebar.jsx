@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { ThemeContext } from "../../context/ThemeContext";
 import { LIGHT_THEME } from "../../constants/themeConstants";
 import LogoBlue from "../../assets/images/logo_blue.svg";
@@ -6,6 +6,7 @@ import LogoWhite from "../../assets/images/logo_white.svg";
 import { Link, useLocation } from "react-router-dom";
 import "./Sidebar.scss";
 import { SidebarContext } from "../../context/SidebarContext";
+import { FaHome, FaFileAlt, FaComments, FaFilter, FaPen, FaClock, FaSignOutAlt, FaGlobe } from "react-icons/fa"; // Icons imported here
 
 const Sidebar = () => {
   const { theme } = useContext(ThemeContext);
@@ -54,20 +55,9 @@ const Sidebar = () => {
                 className={`menu-link ${location.pathname === "/" ? "active" : ""}`}
               >
                 <span className="menu-link-icon">
-                  <i className="fas fa-home"></i>
+                  <FaHome />
                 </span>
                 <span className="menu-link-text">Dashboard</span>
-              </Link>
-            </li>
-            <li className="menu-item">
-              <Link
-                to="/titledes"
-                className={`menu-link ${location.pathname === "/titledes" ? "active" : ""}`}
-              >
-                <span className="menu-link-icon">
-                  <i className="fas fa-pen"></i>
-                </span>
-                <span className="menu-link-text">Title & Description</span>
               </Link>
             </li>
             <li className="menu-item">
@@ -76,20 +66,9 @@ const Sidebar = () => {
                 className={`menu-link ${location.pathname === "/summarizer" ? "active" : ""}`}
               >
                 <span className="menu-link-icon">
-                  <i className="fas fa-file-alt"></i>
+                  <FaFileAlt />
                 </span>
-                <span className="menu-link-text">Summarizer</span>
-              </Link>
-            </li>
-            <li className="menu-item">
-              <Link
-                to="/timestamp"
-                className={`menu-link ${location.pathname === "/timestamp" ? "active" : ""}`}
-              >
-                <span className="menu-link-icon">
-                  <i className="fas fa-clock"></i>
-                </span>
-                <span className="menu-link-text">Timestamp</span>
+                <span className="menu-link-text">Youtube Summarizer</span>
               </Link>
             </li>
             <li className="menu-item">
@@ -98,9 +77,9 @@ const Sidebar = () => {
                 className={`menu-link ${location.pathname === "/chatbot" ? "active" : ""}`}
               >
                 <span className="menu-link-icon">
-                  <i className="fas fa-comments"></i>
+                  <FaComments />
                 </span>
-                <span className="menu-link-text">ChatBot</span>
+                <span className="menu-link-text">Youtube ChatBot</span>
               </Link>
             </li>
             <li className="menu-item">
@@ -109,9 +88,45 @@ const Sidebar = () => {
                 className={`menu-link ${location.pathname === "/commentfilter" ? "active" : ""}`}
               >
                 <span className="menu-link-icon">
-                  <i className="fas fa-filter"></i>
+                  <FaFilter />
                 </span>
-                <span className="menu-link-text">Comment Filter</span>
+                <span className="menu-link-text">Yt Comment Filter</span>
+              </Link>
+            </li>
+            <li className="menu-item">
+              <Link
+                to="/pdfsum"
+                className={`menu-link ${location.pathname === "/pdfsum" ? "active" : ""}`}
+              >
+                <span className="menu-link-icon">
+                  <FaPen />
+                </span>
+                <span className="menu-link-text">PDF Summarizer</span>
+              </Link>
+            </li>
+            
+            <li className="menu-item">
+              <Link
+                to="/pdfchatbot"
+                className={`menu-link ${location.pathname === "/pdfchatbot" ? "active" : ""}`}
+              >
+                <span className="menu-link-icon">
+                  <FaClock />
+                </span>
+                <span className="menu-link-text">Pdf Chatbot</span>
+              </Link>
+            </li>
+            
+           
+            <li className="menu-item">
+              <Link
+                to="/websummarizer"
+                className={`menu-link ${location.pathname === "/websummarizer" ? "active" : ""}`}
+              >
+                <span className="menu-link-icon">
+                  <FaGlobe />
+                </span>
+                <span className="menu-link-text">Website Summarizer</span>
               </Link>
             </li>
           </ul>
@@ -125,7 +140,7 @@ const Sidebar = () => {
                 className={`menu-link ${location.pathname === "/logout" ? "active" : ""}`}
               >
                 <span className="menu-link-icon">
-                  <i className="fas fa-sign-out-alt"></i>
+                  <FaSignOutAlt />
                 </span>
                 <span className="menu-link-text">Logout</span>
               </Link>

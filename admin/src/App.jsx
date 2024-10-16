@@ -7,11 +7,12 @@ import MoonIcon from "./assets/icons/moon.svg";
 import SunIcon from "./assets/icons/sun.svg";
 import BaseLayout from "./layout/BaseLayout";
 import { Dashboard, PageNotFound } from "./screens";
-import TitleDes from "./screens/dashboard/TitleDes";
-import Timestamp from "./screens/dashboard/Timestamp";
+import Pdfsum from "./screens/dashboard/Pdfsum";
+import PdfChatbot from "./screens/dashboard/PdfChatbot";
 import Chatbot from "./screens/dashboard/Chatbot";
 import Commentfilter from "./screens/dashboard/Commentfilter";
 import Summarizer from "./screens/dashboard/summarizer";
+import Websum from "./screens/dashboard/Websum";
 
 function App() {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -31,11 +32,12 @@ function App() {
         <Routes>
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/titledes" element={<TitleDes />} />
+            <Route path="/pdfsum" element={<Pdfsum />} />
             <Route path="/summarizer" element={<Summarizer />} />
-            <Route path="/timestamp" element={<Timestamp />} />
+            <Route path="/pdfchatbot" element={<PdfChatbot />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/commentfilter" element={<Commentfilter />} />
+            <Route path="/websummarizer" element={<Websum />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
         </Routes>

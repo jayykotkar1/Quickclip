@@ -52,7 +52,7 @@ const Pdfsum = () => {
     };
 
     const statusStyles = {
-        "Uploading...": "bg-blue-600 text-white",
+        "Uploading...": "bg-yellow-500 text-white",
         "Uploaded successfully!": "bg-green-600 text-white",
         "Upload failed. Please try again.": "bg-red-600 text-white",
     };
@@ -122,7 +122,7 @@ const Pdfsum = () => {
                                         <path
                                             className="opacity-75"
                                             fill="currentColor"
-                                            d="M4 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8-8-3.582-8-8z"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                                         ></path>
                                     </svg>
                                     {fileStatus}
@@ -173,7 +173,6 @@ const Pdfsum = () => {
                 </div>
             </div>
 
-            {/* Display summary only after clicking Generate Response */}
             {isSummaryVisible && summary && (
                 <div className="mt-5 w-full max-w-mb p-4 bg-gray-800 border border-gray-700 rounded-lg shadow-lg">
                     <h2 className="text-lg font-semibold mb-2 text-white">Summary</h2>
@@ -183,7 +182,7 @@ const Pdfsum = () => {
                                 {paragraph.trim()}
                             </p>
                         ))}
-                    </div> {/* Display formatted summary */}
+                    </div>
                 </div>
             )}
         </>

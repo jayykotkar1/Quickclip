@@ -156,7 +156,7 @@ function Chatbot() {
                             className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl font-medium rounded-lg text-lg px-5 py-2.5"
                             disabled={loadingChatbot} // Disable when waiting for response
                         >
-                            {loadingChatbot ? "Loading..." : "Send"}
+                            {loadingChatbot ? "Thinking..." : "Send"}
                         </button>
                     </form>
 

@@ -58,7 +58,7 @@ const CommentFilter = () => {
         <div className="flex flex-col items-center p-5">
             <h1 className="text-5xl font-bold mb-10 text-white">YouTube Video Comment Filter</h1>
 
-            <form className="w-full max-w-md mb-6">
+            <form className="w-full max-w-full mb-6">
                 <div className="flex flex-col mb-4">
                     <label htmlFor="videoUrl" className="mb-2 text-lg font-semibold text-gray-300">
                         Enter YouTube Video URL:
@@ -77,7 +77,7 @@ const CommentFilter = () => {
                 <button
                     type="button"
                     onClick={handleGenerateResponse}
-                    className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-200 w-full flex items-center justify-center"
+                    className="bg-blue-600 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-700 transition duration-200 w-half flex items-center justify-center"
                     disabled={loading}
                 >
                     {loading ? (

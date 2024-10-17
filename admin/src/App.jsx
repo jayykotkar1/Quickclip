@@ -22,7 +22,7 @@ function App() {
     if (theme === DARK_THEME) {
       document.body.classList.add("dark-mode");
     } else {
-      document.body.classList.remove("dark-mode");
+      document.body.classList.add("dark-mode");
     }
   }, [theme]);
 
@@ -32,26 +32,18 @@ function App() {
         <Routes>
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/pdfsum" element={<Pdfsum />} />
             <Route path="/summarizer" element={<Summarizer />} />
-            <Route path="/pdfchatbot" element={<PdfChatbot />} />
             <Route path="/chatbot" element={<Chatbot />} />
             <Route path="/commentfilter" element={<Commentfilter />} />
+            <Route path="/pdfsum" element={<Pdfsum />} />
+
+            <Route path="/pdfchatbot" element={<PdfChatbot />} />
             <Route path="/websummarizer" element={<Websum />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
         </Routes>
 
-        <button
-          type="button"
-          className="theme-toggle-btn"
-          onClick={toggleTheme}
-        >
-          <img
-            className="theme-icon"
-            src={theme === LIGHT_THEME ? SunIcon : MoonIcon}
-          />
-        </button>
+        
       </Router>
     </>
   );

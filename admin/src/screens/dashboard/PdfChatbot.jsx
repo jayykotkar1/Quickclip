@@ -6,12 +6,11 @@ import { FaUser } from 'react-icons/fa';
 const PdfChatbot = () => {
     const [fileStatus, setFileStatus] = useState("");
     const [fileName, setFileName] = useState(null);
-    const [progress, setProgress] = useState(0);
     const [responses, setResponses] = useState([]);
     const [prompt, setPrompt] = useState("");
     const [loadingChatbot, setLoadingChatbot] = useState(false);
     const [pdfSummary, setPdfSummary] = useState("");
-    const [conversationContext, setConversationContext] = useState(""); // New context to track conversations
+    const [conversationContext, setConversationContext] = useState(""); 
     const [chatbotVisible, setChatbotVisible] = useState(false);
 
     // Handle file upload
@@ -22,24 +21,20 @@ const PdfChatbot = () => {
             setFileStatus("Uploading...");
 
             const formData = new FormData();
-            formData.append("pdf", file);  // Adjusted to match your backend API's expected field name
+            formData.append("pdf", file); 
 
             try {
                 const response = await axios.post("http://localhost:4000/api/quickdash/summarize-pdf", formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
-                    onUploadProgress: (progressEvent) => {
-                        const percentComplete = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                        setProgress(percentComplete);
-                    },
                 });
 
                 if (response.data.success) {
                     setFileStatus("Uploaded successfully!");
                     setPdfSummary(response.data.summary);
-                    setConversationContext(response.data.summary); // Set conversation context with summary
-                    setResponses([...responses, `Chatbot: ${response.data.summary}`]);
+                    setConversationContext(response.data.summary); 
+                    setResponses([...responses, "Chatbot: Chat is ready to assist you based on PDF content!"]);
                     setChatbotVisible(true);
                 } else {
                     setFileStatus("Upload failed. Please try again.");
@@ -59,12 +54,12 @@ const PdfChatbot = () => {
         try {
             const response = await axios.post("http://localhost:4000/api/quickdash/chatbot-query-pdf", {
                 userQuery: prompt,
-                pdfSummary: conversationContext, // Send conversation context with every query
+                pdfSummary: conversationContext,
             });
 
             if (response.data.success) {
                 setResponses([...responses, `You: ${prompt}`, `Chatbot: ${response.data.response}`]);
-                setConversationContext(prev => prev + " " + response.data.response); // Update conversation context
+                setConversationContext(prev => prev + " " + response.data.response);
                 setPrompt("");
             } else {
                 setResponses([...responses, `You: ${prompt}`, "Chatbot: Sorry, I couldn't find an answer."]);
@@ -78,7 +73,15 @@ const PdfChatbot = () => {
 
     // Render HTML safely
     const renderHTML = (response) => {
-        return { __html: response }; // For safely setting inner HTML
+        return { __html: response };
+    };
+
+    // Status bar styles based on fileStatus
+    const statusStyles = {
+        "Uploading...": "bg-yellow-500 text-white",
+        "Uploaded successfully!": "bg-green-600 text-white",
+        "Upload failed. Please try again.": "bg-red-600 text-white",
+        "Error uploading file. Please check your connection.": "bg-red-600 text-white",
     };
 
     return (
@@ -120,32 +123,42 @@ const PdfChatbot = () => {
                             type="file"
                             className="hidden"
                             onChange={handleFileUpload}
-                            accept="application/pdf" // Ensure only PDF files can be uploaded
+                            accept="application/pdf"
                         />
                     </label>
                 </div>
 
-                <div className="mt-4 text-center">
+                <div className="mt-4">
                     {fileStatus && (
-                        <div
-                            className={`text-sm font-medium p-2 rounded-md ${
-                                fileStatus === "Uploaded successfully!"
-                                    ? "text-green-700 bg-green-100"
-                                    : "text-yellow-700 bg-yellow-100"
-                            }`}
-                        >
-                            {fileStatus}
-                        </div>
-                    )}
-
-                    {progress > 0 && fileStatus === "Uploading..." && (
-                        <div className="w-full bg-gray-200 rounded-full mt-2">
-                            <div
-                                className="bg-blue-600 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
-                                style={{ width: `${progress}%` }}
-                            >
-                                {progress}%
-                            </div>
+                        <div className={`flex items-center justify-center p-4 ${statusStyles[fileStatus]} font-semibold rounded-md shadow-md`}>
+                            {fileStatus === "Uploading..." && (
+                                <>
+                                    <svg
+                                        className="animate-spin h-5 w-5 mr-2 text-white"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                        ></path>
+                                    </svg>
+                                    {fileStatus}
+                                </>
+                            )}
+                            {fileStatus !== "Uploading..." && (
+                                <span>{fileStatus}</span>
+                            )}
                         </div>
                     )}
 
@@ -200,11 +213,12 @@ const PdfChatbot = () => {
                             />
                             <button
                                 type="submit"
-                                className="bg-blue-500 text-white px-4 py-2 rounded-lg disabled:bg-blue-300 disabled:cursor-not-allowed"
+                                className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl font-medium rounded-lg text-lg px-5 py-2.5 bg-blue-500 text-white px-4 py-2 rounded-lg disabled:bg-blue-300 disabled:cursor-not-allowed"
                                 disabled={loadingChatbot}
                             >
                                 {loadingChatbot ? 'Thinking...' : 'Send'}
                             </button>
+                            
                         </form>
                     </div>
                 </div>

@@ -40,7 +40,7 @@ const Sidebar = () => {
       <div className="sidebar-top">
         <div className="sidebar-brand">
           <img src={theme === LIGHT_THEME ? LogoBlue : LogoWhite} alt="" />
-          <span className="sidebar-brand-text">tabernam.</span>
+          <span className="sidebar-brand-text">Quickclip.</span>
         </div>
         <button className="sidebar-close-btn" onClick={closeSidebar}>
           <i className="fas fa-times" size={24}></i>
@@ -135,15 +135,7 @@ const Sidebar = () => {
         <div className="sidebar-menu sidebar-menu2">
           <ul className="menu-list">
             <li className="menu-item">
-              <Link
-                to="/logout"
-                className={`menu-link ${location.pathname === "/logout" ? "active" : ""}`}
-              >
-                <span className="menu-link-icon">
-                  <FaSignOutAlt />
-                </span>
-                <span className="menu-link-text">Logout</span>
-              </Link>
+              
             </li>
           </ul>
         </div>
